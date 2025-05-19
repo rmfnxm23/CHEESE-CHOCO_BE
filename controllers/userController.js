@@ -128,4 +128,76 @@ const userLogin = async (req, res) => {
   }
 };
 
-module.exports = { userRegister, emailCheck, phoneCheck, userLogin };
+// 아이디 찾기
+const getUserId = async (req, res) => {
+  try {
+    const { phone } = req.body;
+
+    const userPhone = await User.findOne({ where: { phone } });
+
+    if (!phone) {
+      res.send({
+        exists: false,
+        message: "아이디를 찾기 위해 등록된 번호를 입력해주세요.",
+      });
+    }
+
+    if (userPhone) {
+      res.status(200).json({
+        exists: true,
+        userPhone: userPhone,
+      });
+    } else {
+      res.send({
+        exists: false,
+        message: "일치하는 아이디가 존재하지 않습니다.",
+      });
+    }
+  } catch (err) {
+    console.error(err);
+    res
+      .status(500)
+      .json({ exists: false, message: "서버 오류가 발생했습니다." });
+  }
+};
+
+// 비밀번호 찾기 (이메일 DB조회)
+const getUserPw = async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    if (!email) {
+      return res.json({ success: false, message: "이메일을 입력해주세요." });
+    }
+
+    const userId = await User.findOne({ where: { email } });
+
+    if (userId) {
+      res.status(200).json({
+        success: true,
+        message: "해당 이메일이 조회되었습니다.",
+        userId: userId.email, // 조회된 이메일만 전송
+      });
+    } else {
+      res.json({
+        success: false,
+        message: "일치하는 아이디가 존재하지 않습니다.",
+      });
+    }
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({
+      success: false,
+      message: "서버 오류가 발생했습니다.",
+    });
+  }
+};
+
+module.exports = {
+  userRegister,
+  emailCheck,
+  phoneCheck,
+  userLogin,
+  getUserId,
+  getUserPw,
+};
