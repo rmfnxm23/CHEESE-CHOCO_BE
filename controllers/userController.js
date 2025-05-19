@@ -88,4 +88,44 @@ const phoneCheck = async (req, res) => {
   }
 };
 
-module.exports = { userRegister, emailCheck, phoneCheck };
+// 로그인
+const userLogin = async (req, res) => {
+  try {
+    let { email, password } = req.body;
+
+    if (!email || !password) {
+      return res.status(201).json({
+        success: false,
+        message: "아이디 또는 비밀번호를 입력해주세요.",
+      });
+    }
+
+    const userData = await User.findOne({ where: { email } });
+
+    if (!userData) {
+      return res
+        .status(201)
+        .json({ success: false, message: "해당 유저가 존재하지 않습니다." });
+    }
+
+    const matchedPass = await bcrypt.compare(password, userData.password); // 입력한 비밀번호화 DB에 저장된 해시비밀번호 비교
+
+    if (!matchedPass) {
+      return res.json({
+        success: false,
+        message: "비밀번호가 일치하지 않습니다.",
+      });
+    }
+    res
+      .status(201)
+      .json({ success: true, message: "로그인되었습니다.", user: userData });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({
+      success: false,
+      message: "서버 오류가 발생했습니다.",
+    });
+  }
+};
+
+module.exports = { userRegister, emailCheck, phoneCheck, userLogin };

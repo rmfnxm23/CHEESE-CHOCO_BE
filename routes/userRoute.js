@@ -12,4 +12,7 @@ router.post("/check/email", userController.emailCheck);
 // 중복확인 (휴대폰 번호)
 router.post("/check/phone", userController.phoneCheck);
 
+// 로그인
+router.post("/login", userController.userLogin);
+
 module.exports = router;
