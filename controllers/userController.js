@@ -1,5 +1,7 @@
 const { User } = require("../models");
 const bcrypt = require("bcrypt");
+const nodemailer = require("nodemailer");
+require("dotenv").config();
 
 // 회원가입
 const userRegister = async (req, res) => {
@@ -170,26 +172,132 @@ const getUserPw = async (req, res) => {
       return res.json({ success: false, message: "이메일을 입력해주세요." });
     }
 
-    const userId = await User.findOne({ where: { email } });
+    const user = await User.findOne({ where: { email } });
 
-    if (userId) {
-      res.status(200).json({
-        success: true,
-        message: "해당 이메일이 조회되었습니다.",
-        userId: userId.email, // 조회된 이메일만 전송
-      });
-    } else {
-      res.json({
+    if (!user) {
+      return res.json({
         success: false,
         message: "일치하는 아이디가 존재하지 않습니다.",
       });
     }
+
+    console.log(user.id, "id");
+
+    // 인증코드 생성 (1000 ~ 9999 사이)
+    const code = Math.floor(Math.floor(1000 + Math.random() * 9000));
+
+    // 만료시간 설정 (현재 시간으로부터 10분까지 유효시간)
+    const codeExpirationTime = Date.now() + 1000 * 60 * 10;
+
+    await User.update(
+      {
+        pwResetCode: code,
+        pwResetCodeEx: codeExpirationTime,
+      },
+      { where: { id: user.id } }
+    );
+
+    // 새 비밀번호 등록 링크를 메일로 전송
+    const transporter = nodemailer.createTransport({
+      service: process.env.SMTP_ADDRESS,
+      auth: {
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASS,
+      },
+    });
+
+    // 비밀번호 재설정 url
+    const link = `http://localhost:3000/find/changepw/${user.id}`;
+
+    // 메일 옵션 설정
+    const mailOptions = {
+      from: process.env.SMTP_USER,
+      to: email,
+      subject: "[CHEESE&CHOCO] 비밀번호 재설정 안내",
+      html: `
+        <p>아래 링크를 클릭하여 인증코드를 입력하고 비밀번호를 재설정하세요.<br>
+        인증코드: <strong>${code}</strong></p>
+        <a href="${link}">비밀번호 재설정</a>
+        <p>위 링크는 10분동안 유효합니다.</p>
+        `,
+    };
+
+    // 이메일 전송
+    await transporter.sendMail(mailOptions);
+
+    res.json({
+      success: true,
+      message: "비밀번호 재설정 링크가 이메일로 전송되었습니다.",
+    });
   } catch (err) {
     console.error(err);
     res.status(500).json({
       success: false,
       message: "서버 오류가 발생했습니다.",
     });
+  }
+};
+
+// 인증 코드 검증 (일치 확인)
+const verifyCode = async (req, res) => {
+  try {
+    let { id, code } = req.body;
+
+    const userData = await User.findOne({ where: { id } });
+
+    if (!userData) {
+      return res.json({ success: false, message: "유저를 찾을 수 없습니다." });
+    }
+
+    // 인증코드의 유효시간 체크
+    const isExpired = userData.pwResetCodeEx > Date.now();
+
+    console.log("인증코드 유효 여부:", isExpired); // false 만료됨
+
+    if (!isExpired) {
+      return res.json({
+        success: false,
+        message: "인증번호가 만료되었습니다.",
+      });
+    }
+
+    if (userData.pwResetCode !== code) {
+      return res.json({
+        success: false,
+        message: "인증번호가 일치하지 않습니다.",
+      });
+    }
+
+    res.json({ success: true, message: "인증되었습니다." });
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+// 비밀번호 변경
+const updateUserPw = async (req, res) => {
+  try {
+    let { id, password } = req.body;
+
+    const hashPassword = await bcrypt.hash(password, 10);
+
+    const userData = await User.update(
+      { password: hashPassword }, // 수정할 데이터
+      { where: { id } }
+    );
+    if (userData) {
+      res.status(200).json({
+        success: true,
+        message: "비밀번호 변경에 성공하였습니다.",
+      });
+    } else {
+      res.json({
+        success: false,
+        message: "비밀번호 변경에 실패하셨습니다.",
+      });
+    }
+  } catch (err) {
+    console.error(err);
   }
 };
 
@@ -200,4 +308,6 @@ module.exports = {
   userLogin,
   getUserId,
   getUserPw,
+  verifyCode,
+  updateUserPw,
 };

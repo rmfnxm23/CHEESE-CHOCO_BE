@@ -38,6 +38,14 @@ module.exports = (sequelize, DataTypes) => {
       userType: {
         type: Sequelize.STRING(15),
       },
+      pwResetCode: {
+        type: Sequelize.STRING(11),
+        allowNull: true,
+      },
+      pwResetCodeEx: {
+        type: Sequelize.DATE,
+        allowNull: true,
+      },
     },
     {
       sequelize,
