@@ -16,6 +16,8 @@ db.sequelize = sequelize;
 db.Sequelize = Sequelize;
 
 db.User = require("./user")(sequelize, Sequelize);
+db.Category = require("./category")(sequelize, Sequelize);
+db.Product = require("./product")(sequelize, Sequelize);
 
 sequelize
   .sync({ force: false })
