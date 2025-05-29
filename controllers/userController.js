@@ -2,6 +2,7 @@ const { User } = require("../models");
 const bcrypt = require("bcrypt");
 const nodemailer = require("nodemailer");
 require("dotenv").config();
+const jwt = require("jsonwebtoken");
 
 // 회원가입
 const userRegister = async (req, res) => {
@@ -118,9 +119,26 @@ const userLogin = async (req, res) => {
         message: "비밀번호가 일치하지 않습니다.",
       });
     }
-    res
-      .status(201)
-      .json({ success: true, message: "로그인되었습니다.", user: userData });
+
+    const payload = { id: userData.id, email: userData.email };
+    const accessToken = jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, {
+      expiresIn: "1h",
+    });
+    // console.log(accessToken);
+
+    const refreshToken = jwt.sign(
+      { id: userData.id },
+      process.env.REFRESH_TOKEN_SECRET,
+      { expiresIn: "1d" }
+    );
+
+    res.status(201).json({
+      success: true,
+      message: "로그인되었습니다.",
+      user: userData,
+      accessToken,
+      refreshToken,
+    });
   } catch (err) {
     console.error(err);
     return res.status(500).json({
@@ -301,6 +319,29 @@ const updateUserPw = async (req, res) => {
   }
 };
 
+// 로그인한 사용자(나) 정보
+const getMe = async (req, res) => {
+  try {
+    const userId = req.user.id; // 미들웨어에서 넣어준 사용자 id
+
+    const user = await User.findOne({
+      where: { id: userId },
+      attributes: { exclude: ["password"] }, // 비밀번호 제외
+    });
+
+    if (!user) {
+      return res
+        .status(404)
+        .json({ success: false, message: "사용자를 찾을 수 없습니다." });
+    }
+
+    return res.status(200).json({ success: true, user });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ success: false, message: "서버 오류" });
+  }
+};
+
 module.exports = {
   userRegister,
   emailCheck,
@@ -310,4 +351,5 @@ module.exports = {
   getUserPw,
   verifyCode,
   updateUserPw,
+  getMe,
 };

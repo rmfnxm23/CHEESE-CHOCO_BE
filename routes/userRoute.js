@@ -3,6 +3,8 @@ const router = express.Router();
 
 const userController = require("../controllers/userController");
 
+const { authenticate } = require("../middlewares/auth");
+
 // 회원가입
 router.post("/register", userController.userRegister);
 
@@ -26,5 +28,7 @@ router.post("/pwVerifyCode", userController.verifyCode);
 
 // 비밀번호 변경
 router.post("/change/pw", userController.updateUserPw);
+
+router.get("/me", authenticate, userController.getMe);
 
 module.exports = router;

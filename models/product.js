@@ -32,6 +32,12 @@ module.exports = (sequelize, DataTypes) => {
       content: {
         type: Sequelize.TEXT("long"),
       },
+      color: {
+        type: Sequelize.STRING(100),
+      },
+      size: {
+        type: Sequelize.STRING(100),
+      },
       createdAt: {
         type: Sequelize.DATE,
         allowNull: false,
