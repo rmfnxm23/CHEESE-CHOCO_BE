@@ -2,26 +2,44 @@ const { Product } = require("../models");
 
 const callbackImage = (req, res) => {
   const imageUrl = `/uploads/editor/${req.file.filename}`;
-  res.send(imageUrl);
+  // res.send(imageUrl);
+  res.json({ url: imageUrl });
 };
 
 // 상품 등록
 const itemRegister = async (req, res) => {
   try {
-    console.log(req.files, "배열?");
+    // console.log(req.files, "배열?");
 
     const imgList = req.files.map((file) => file.filename);
-    console.log(imgList, "저장 상태");
+    // console.log(imgList, "저장 상태");
 
-    let { name, price, content } = req.body;
+    let { name, price, content, color, size } = req.body;
+
+    // console.log(color, "color");
+    // console.log(size, "size");
     // const img = req.file ? req.file.filename : null;
     // console.log(img);
 
+    const colorArray = color
+      .split(",")
+      .map((item) => item.trim())
+      .filter((item) => item); // 공백 제거 + 빈 값 제거
+    console.log(typeof colorArray);
+
+    const sizeArray = size
+      .split(",")
+      .map((item) => item.trim())
+      .filter((item) => item); // 공백 제거 + 빈 값 제거
+
+    // return;
     await Product.create({
       img: JSON.stringify(imgList), // 배열 형태의 데이터를 문자열로 변환 // JSON.parse(dbValue): 문자열을 다시 배열로 복원하려고
       name,
       price,
       content,
+      color: JSON.stringify(colorArray),
+      size: JSON.stringify(sizeArray),
     });
 
     res.status(201).json({ message: "상품이 등록되었습니다." });
@@ -68,9 +86,13 @@ const getItem = async (req, res) => {
 
     // 이미지 필드가 JSON 문자열이면 배열로 파싱
     const imgUrls = item.img ? JSON.parse(item.img) : [];
+    const colorArray = item.color ? JSON.parse(item.color) : [];
+    const sizeArray = item.size ? JSON.parse(item.size) : [];
 
     // res.json({ data: item });
-    res.status(200).json({ data: { ...item.dataValues, imgUrls } });
+    res
+      .status(200)
+      .json({ data: { ...item.dataValues, imgUrls, colorArray, sizeArray } });
   } catch (err) {
     console.error(err);
     res
