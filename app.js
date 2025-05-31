@@ -9,6 +9,7 @@ const cors = require("cors"); // Cross Origin Resource Sharing의 약자로서 �
 const userRouter = require("./routes/userRoute");
 const productRouter = require("./routes/productRoute");
 const categoryRouter = require("./routes/categoryRoute");
+const cartRouter = require("./routes/cartRoute");
 
 app.use(
   cors({
@@ -28,6 +29,7 @@ app.use(express.urlencoded({ extended: true })); // URL-encoded 형식의 데이
 app.use("/user", userRouter);
 app.use("/admin", productRouter);
 app.use("/category", categoryRouter);
+app.use("/cart", cartRouter);
 
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);

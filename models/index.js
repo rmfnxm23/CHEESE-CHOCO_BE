@@ -18,6 +18,21 @@ db.Sequelize = Sequelize;
 db.User = require("./user")(sequelize, Sequelize);
 db.Category = require("./category")(sequelize, Sequelize);
 db.Product = require("./product")(sequelize, Sequelize);
+db.Cart = require("./cart")(sequelize, Sequelize);
+
+// js는 single 스레드라 순차적으로 읽기 때문에 각각의 파일에 관계를 설정할 경우 연결이 제대로 되지 않는다. index에 작성해야 읽을 수 있음.
+
+// Cart → Product (N:1)
+db.Cart.belongsTo(db.Product, {
+  foreignKey: "productId",
+  as: "product", // Cart에서 Product 조회할 때 사용
+});
+
+// Product → Cart (1:N)
+db.Product.hasMany(db.Cart, {
+  foreignKey: "productId",
+  as: "carts", // Product에서 Cart 항목들 조회할 때 사용
+});
 
 sequelize
   .sync({ force: false })
