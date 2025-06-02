@@ -1,9 +1,20 @@
 const { Product } = require("../models");
+require("dotenv").config();
 
+const { cleanUnusedImages } = require("../services/editorImageCleaner");
+
+// 에디터(content:본문) 이미지 업로드
 const callbackImage = (req, res) => {
-  const imageUrl = `/uploads/editor/${req.file.filename}`;
-  // res.send(imageUrl);
-  res.json({ url: imageUrl });
+  if (!req.files || req.files.length === 0) {
+    return res.status(400).json({ error: "파일이 첨부되지 않았습니다." });
+  }
+
+  // 여러 이미지의 URL 반환
+  const urls = req.files.map((file) => {
+    return `${process.env.BASE_URL}/uploads/editor/${file.filename}`;
+  });
+
+  res.status(200).json({ urls }); // 배열 형태로 반환
 };
 
 // 상품 등록
@@ -41,6 +52,9 @@ const itemRegister = async (req, res) => {
       color: JSON.stringify(colorArray),
       size: JSON.stringify(sizeArray),
     });
+
+    // 미사용 이미지 정리 서비스 호출
+    cleanUnusedImages(content);
 
     res.status(201).json({ message: "상품이 등록되었습니다." });
   } catch (err) {
