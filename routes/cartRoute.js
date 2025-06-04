@@ -11,4 +11,7 @@ router.post("/register", authenticate, cartController.cartRegister);
 // 장바구니 조회 (사용자 id)
 router.get("/myCart", authenticate, cartController.getMyCartList);
 
+// 장바구니 상품 삭제
+router.delete("/:id", authenticate, cartController.deleteCartItem);
+
 module.exports = router;

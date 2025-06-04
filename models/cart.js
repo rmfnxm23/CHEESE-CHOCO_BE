@@ -32,6 +32,9 @@ module.exports = (sequelize, DataTypes) => {
       selectSize: {
         type: Sequelize.STRING,
       },
+      price: {
+        type: Sequelize.INTEGER,
+      },
       quantity: {
         type: Sequelize.INTEGER,
       },

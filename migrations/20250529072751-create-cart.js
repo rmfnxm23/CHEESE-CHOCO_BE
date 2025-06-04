@@ -21,6 +21,9 @@ module.exports = {
       selectSize: {
         type: Sequelize.STRING,
       },
+      price: {
+        type: Sequelize.INTEGER,
+      },
       quantity: {
         type: Sequelize.INTEGER,
       },
