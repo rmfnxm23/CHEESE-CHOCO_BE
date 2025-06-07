@@ -25,7 +25,7 @@ const itemRegister = async (req, res) => {
     const imgList = req.files.map((file) => file.filename);
     // console.log(imgList, "저장 상태");
 
-    let { name, price, content, color, size } = req.body;
+    let { name, price, content, color, size, categoryId } = req.body;
 
     // console.log(color, "color");
     // console.log(size, "size");
@@ -51,6 +51,7 @@ const itemRegister = async (req, res) => {
       content,
       color: JSON.stringify(colorArray),
       size: JSON.stringify(sizeArray),
+      categoryId,
     });
 
     // 미사용 이미지 정리 서비스 호출

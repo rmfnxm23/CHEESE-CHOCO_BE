@@ -38,6 +38,9 @@ module.exports = (sequelize, DataTypes) => {
       size: {
         type: Sequelize.STRING(100),
       },
+      categoryId: {
+        type: Sequelize.INTEGER(11),
+      },
       createdAt: {
         type: Sequelize.DATE,
         allowNull: false,
