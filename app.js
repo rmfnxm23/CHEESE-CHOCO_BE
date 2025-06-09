@@ -10,6 +10,8 @@ const userRouter = require("./routes/userRoute");
 const productRouter = require("./routes/productRoute");
 const categoryRouter = require("./routes/categoryRoute");
 const cartRouter = require("./routes/cartRoute");
+const addressRouter = require("./routes/shopping_address_Route.js");
+const paymentRouter = require("./routes/paymentRoute.js");
 
 app.use(
   cors({
@@ -30,6 +32,8 @@ app.use("/user", userRouter);
 app.use("/admin", productRouter);
 app.use("/category", categoryRouter);
 app.use("/cart", cartRouter);
+app.use("/address", addressRouter);
+app.use("/payment", paymentRouter);
 
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);

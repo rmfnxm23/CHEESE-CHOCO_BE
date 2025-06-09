@@ -19,6 +19,8 @@ db.User = require("./user")(sequelize, Sequelize);
 db.Category = require("./category")(sequelize, Sequelize);
 db.Product = require("./product")(sequelize, Sequelize);
 db.Cart = require("./cart")(sequelize, Sequelize);
+db.Shopping_Address = require("./shopping_address")(sequelize, Sequelize);
+db.Payment = require("./payment")(sequelize, Sequelize);
 
 // js는 single 스레드라 순차적으로 읽기 때문에 각각의 파일에 관계를 설정할 경우 연결이 제대로 되지 않는다. index에 작성해야 읽을 수 있음.
 
