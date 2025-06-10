@@ -1,4 +1,4 @@
-const { Product } = require("../models");
+const { Product, Category } = require("../models");
 require("dotenv").config();
 
 const { cleanUnusedImages } = require("../services/editorImageCleaner");
@@ -65,10 +65,27 @@ const itemRegister = async (req, res) => {
 
 // 상품 전체 조회
 const getItems = async (req, res) => {
-  const { limit, sort } = req.query;
+  const { limit, sort, category } = req.query;
   console.log(limit, sort);
+
+  console.log(req.query.category, "서버에서 확인"); // 서버에서 확인
   try {
+    const whereClause = {};
+
+    if (category) {
+      whereClause.categoryId = category;
+      console.log(typeof whereClause.categoryId);
+      console.log(typeof category);
+    }
+
     const items = await Product.findAll({
+      where: whereClause,
+      include: [
+        {
+          model: Category,
+          attributes: ["id", "category"], // 필요한 카테고리 필드만
+        },
+      ],
       ...(limit && { limit: parseInt(limit) }), // 4개 제한
       ...(sort === "desc" && { order: [["createdAt", "DESC"]] }), // 최신순 정렬
     });
@@ -79,6 +96,7 @@ const getItems = async (req, res) => {
       imgUrls: item.img ? JSON.parse(item.img) : [],
     }));
 
+    console.log(items.length, "조회된 아이템 수");
     // res.json({ data: items });
     res.json({ data: formatted });
   } catch (err) {
@@ -121,7 +139,7 @@ const updateProduct = async (req, res) => {
   try {
     let { id } = req.params;
 
-    let { name, price, content } = req.body;
+    let { name, price, content, color, size, categoryId } = req.body;
 
     let imgUrls = [];
 
@@ -139,12 +157,28 @@ const updateProduct = async (req, res) => {
       }
     }
 
+    const colorArray = color
+      .split(",")
+      .map((item) => item.trim())
+      .filter((item) => item); // 공백 제거 + 빈 값 제거
+    console.log(typeof colorArray);
+
+    const sizeArray = size
+      .split(",")
+      .map((item) => item.trim())
+      .filter((item) => item); // 공백 제거 + 빈 값 제거
+
+    const CategoryId = parseInt(categoryId, 10); // 숫자로 변환
+
     const product = await Product.update(
       {
         img: JSON.stringify(imgUrls), // 배열 형태의 데이터를 문자열로 변환 // JSON.parse(dbValue): 문자열을 다시 배열로 복원하려고
         name,
         price,
         content,
+        color: JSON.stringify(colorArray),
+        size: JSON.stringify(sizeArray),
+        categoryId: CategoryId,
       },
       { where: { id } }
     );

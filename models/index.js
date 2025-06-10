@@ -36,6 +36,9 @@ db.Product.hasMany(db.Cart, {
   as: "carts", // Product에서 Cart 항목들 조회할 때 사용
 });
 
+db.Category.hasMany(db.Product, { foreignKey: "categoryId" });
+db.Product.belongsTo(db.Category, { foreignKey: "categoryId" });
+
 sequelize
   .sync({ force: false })
   .then(() => {
