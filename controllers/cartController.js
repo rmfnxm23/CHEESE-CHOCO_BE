@@ -2,22 +2,10 @@ const { Cart, Product } = require("../models");
 
 // 장바구니 등록
 const cartRegister = async (req, res) => {
-  // let { id, selectedColor, selectedSize } = req.body;
-  // console.log(selectedColor, selectedSize);
   let { id, options } = req.body;
-  console.log(options);
-  // return;
-  const userId = req.user.id; // 미들웨어에서 넣어준 사용자 id
-  // let quantity = 1;
 
-  // Cart.create({
-  //   userId: userId,
-  //   productId: Number(id),
-  //   selectColor: options.selectColor,
-  //   selectSize: options.selectSize,
-  //   price: options.price,
-  //   quantity: options.quantity,
-  // });
+  const userId = req.user.id; // 미들웨어에서 넣어준 사용자 id
+
   // 각 옵션마다 Cart에 추가
   await Promise.all(
     options.map((opt) =>
@@ -38,9 +26,7 @@ const cartRegister = async (req, res) => {
 // 장바구니 조회 (사용자 id).
 const getMyCartList = async (req, res) => {
   try {
-    // let {} = req.params;
     const userId = req.user.id;
-    console.log(userId);
 
     const MyCart = await Cart.findAll({
       where: { userId },
@@ -52,7 +38,6 @@ const getMyCartList = async (req, res) => {
       ],
     });
 
-    // console.log(MyCart);
     // img 파싱 처리
     const parsedCart = MyCart.map((item) => {
       const product = item.product;
@@ -71,7 +56,6 @@ const getMyCartList = async (req, res) => {
           : null,
       };
     });
-    // console.log(parsedCart, "hey");
 
     res.status(200).json({ data: parsedCart });
   } catch (err) {
@@ -83,8 +67,7 @@ const getMyCartList = async (req, res) => {
 const deleteCartItem = async (req, res) => {
   const userId = req.user.id;
   const cartItemId = Number(req.params.id);
-  console.log(userId, cartItemId); // 1 1
-  // return;
+
   try {
     // 본인 장바구니 아이템인지 확인 (보안)
     const cartItem = await Cart.findOne({

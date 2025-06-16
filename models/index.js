@@ -30,14 +30,14 @@ db.Cart.belongsTo(db.Product, {
   foreignKey: "productId",
   as: "product", // Cart에서 Product 조회할 때 사용
   onUpdate: "CASCADE",
-  onDelete: "CASCADE", // 꼭 추가
+  onDelete: "CASCADE",
   hooks: true, // Sequelize가 cascade를 실행하려면 hooks도 필요
 });
 
 // Product → Cart (1:N)
 db.Product.hasMany(db.Cart, {
   foreignKey: "productId",
-  as: "carts", // Product에서 Cart 항목들 조회할 때 사용
+  as: "carts", // Product에서 Cart 조회할 때 사용
   onUpdate: "CASCADE",
   onDelete: "CASCADE",
   hooks: true,

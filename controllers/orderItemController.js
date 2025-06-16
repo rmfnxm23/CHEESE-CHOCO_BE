@@ -2,8 +2,7 @@ const { OrderItem } = require("../models");
 
 const saveItem = async (req, res) => {
   try {
-    const { paymentId, items } = req.body; // items = [{ productId, quantity, price }, ...]
-    console.log(paymentId, items, "123123");
+    const { paymentId, items } = req.body;
 
     const orderItems = await Promise.all(
       items.map((item) =>

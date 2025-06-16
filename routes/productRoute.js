@@ -5,23 +5,6 @@ const path = require("path");
 
 const productController = require("../controllers/productController");
 
-// // 저장 위치 및 파일명 지정
-// const storage = multer.diskStorage({
-//   destination: (req, file, cb) => {
-//     cb(null, "uploads/"); // 상대경로 또는 절대경로로 지정
-//   },
-//   //   filename: (req, file, cb) => {
-//   //     // const ext = path.extname(file.originalname);
-//   //     // cb(null, Date.now() + "-" + file.originalname);
-//   //     const ext = path.extname(file.originalname); // 확장자 추출
-//   //     const basename = path.basename(file.originalname, ext); // 확장자 제외한 순수 이름 추출
-//   //     const safeName = basename.replace(/[^a-z0-9]/gi, "_").toLowerCase(); // 특수 문자 제거
-//   //     cb(null, `${Date.now()}-${safeName}${ext}`); // 파일명 중복 방지를 위해 Date.now() 추가
-//   //   },
-// });
-
-// const upload = multer({ storage });
-
 // 기존 product 이미지 업로드 (product/ 폴더에 저장)
 const productStorage = multer.diskStorage({
   destination: (req, file, cb) => {

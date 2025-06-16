@@ -8,11 +8,10 @@ const {
 } = require("../models");
 const axios = require("axios");
 
+// 결제 등록
 const payOrder = async (req, res) => {
   try {
     const { userId, shippingInfoId, totalAmount } = req.body;
-
-    // console.log("dfsdfsdfsfsdf", userId, shippingInfoId, totalAmount);
 
     const payment = await Payment.create({
       userId,
@@ -28,9 +27,8 @@ const payOrder = async (req, res) => {
   }
 };
 
+// 결제 승인 확인
 const tossConfirm = async (req, res) => {
-  console.log("111111111");
-  // const { paymentKey, orderId, amount, items, paymentId } = req.body;
   const { paymentKey, orderId, amount, items = [], paymentId } = req.body;
 
   if (!Array.isArray(items) || items.length === 0) {
@@ -38,8 +36,8 @@ const tossConfirm = async (req, res) => {
       .status(400)
       .json({ success: false, message: "items가 없습니다" });
   }
-  const userId = req.user.id; // 로그인한 사용자 정보
-  // console.log("[🔐 TOSS_SECRET_KEY]", process.env.TOSS_SECRET_KEY);
+  const userId = req.user.id;
+
   try {
     const response = await axios.post(
       `https://api.tosspayments.com/v1/payments/confirm`, // ✅ Toss 결제 승인 요청 URL
@@ -59,62 +57,14 @@ const tossConfirm = async (req, res) => {
     );
 
     const data = response.data;
-    // console.log(data);
 
-    // try {
-    //   const res = await axios.get("/");
-    // } catch (err) {
-    //   console.error(err);
-    // }
-
-    // await Payment.update({
-    //   orderId: data.orderId,
-    //   amount: data.totalAmount,
-    //   method: data.method,
-    //   status: "DONE",
-    //   userId: userId,
-    // });
-    console.log("결제 항목:", items);
-    // console.log(typeof paymentId, "12321321351351");
-    // return;
+    // ✅ 결제 업데이트
     await Payment.update(
       { orderId: data.orderId, method: data.method, status: "DONE" },
       {
         where: { id: Number(paymentId) },
       }
     );
-    // return;
-    // ✅ Payment 저장
-    // const payment = await Payment.create({
-    //   userId,
-    //   orderId,
-    //   amount: totalAmount,
-    //   method: verifyRes.data.method,
-    //   status: "DONE",
-    // });
-
-    // ✅ PaymentItem 저장
-    // for (const item of items) {
-    //   await PaymentItem.create({
-    //     paymentId: payment.id,
-    //     productId: item.productId,
-    //     quantity: item.quantity,
-    //     price: item.price,
-    //   });
-    // }
-
-    // return;
-    // if (items && Array.isArray(items)) {
-    //   const orderItems = items.map((item) => ({
-    //     paymentId: paymentId,
-    //     productId: item.id, // item 객체 안의 product id
-    //     quantity: item.quantity, // 수량
-    //     price: item.price, // 단가
-    //   }));
-    //   await OrderItem.bulkCreate(orderItems);
-    // }
-
-    // return;
 
     // ✅ 장바구니에서 삭제
     const cartIds = items.map((item) => item);
@@ -140,6 +90,7 @@ const tossConfirm = async (req, res) => {
   }
 };
 
+// 결제 내역 조회
 const getOrderList = async (req, res) => {
   try {
     const userId = req.user.id;
@@ -181,7 +132,7 @@ const getOrderList = async (req, res) => {
           ...item.toJSON(),
           product: {
             ...item.product.toJSON(),
-            firstImage, // 👈 프론트에서 바로 사용 가능
+            firstImage,
           },
         };
       });

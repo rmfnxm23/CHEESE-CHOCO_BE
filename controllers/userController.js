@@ -124,7 +124,6 @@ const userLogin = async (req, res) => {
     const accessToken = jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, {
       expiresIn: "1d",
     });
-    // console.log(accessToken);
 
     const refreshToken = jwt.sign(
       { id: userData.id },
@@ -199,8 +198,6 @@ const getUserPw = async (req, res) => {
       });
     }
 
-    console.log(user.id, "id");
-
     // 인증코드 생성 (1000 ~ 9999 사이)
     const code = Math.floor(Math.floor(1000 + Math.random() * 9000));
 
@@ -270,8 +267,6 @@ const verifyCode = async (req, res) => {
     // 인증코드의 유효시간 체크
     const isExpired = userData.pwResetCodeEx > Date.now();
 
-    console.log("인증코드 유효 여부:", isExpired); // false 만료됨
-
     if (!isExpired) {
       return res.json({
         success: false,
@@ -303,6 +298,7 @@ const updateUserPw = async (req, res) => {
       { password: hashPassword }, // 수정할 데이터
       { where: { id } }
     );
+
     if (userData) {
       res.status(200).json({
         success: true,
@@ -322,7 +318,7 @@ const updateUserPw = async (req, res) => {
 // 로그인한 사용자(나) 정보
 const getMe = async (req, res) => {
   try {
-    const userId = req.user.id; // 미들웨어에서 넣어준 사용자 id
+    const userId = req.user.id; // 로그인한 사용자 id
 
     const user = await User.findOne({
       where: { id: userId },
@@ -346,7 +342,6 @@ const getMe = async (req, res) => {
 const updateMe = async (req, res) => {
   try {
     let { id, phone } = req.body;
-    console.log(phone, "폰넘버");
 
     await User.update({ phone }, { where: { id } });
 

@@ -21,38 +21,26 @@ const callbackImage = (req, res) => {
 // 상품 등록
 const itemRegister = async (req, res) => {
   try {
-    // console.log(req.files, "배열?");
-
     const imgList = req.files.map((file) => file.filename);
-    // console.log(imgList, "저장 상태");
 
     let { name, price, content, color, size, categoryId } = req.body;
-
-    // console.log(color, "color");
-    // console.log(size, "size");
-    // const img = req.file ? req.file.filename : null;
-    // console.log(img);
 
     const colorArray = color
       .split(",")
       .map((item) => item.trim())
       .filter((item) => item); // 공백 제거 + 빈 값 제거
-    console.log(typeof colorArray);
 
     const sizeArray = size
       .split(",")
       .map((item) => item.trim())
       .filter((item) => item); // 공백 제거 + 빈 값 제거
 
-    console.log(colorArray, "colorArray");
-    // return;
     await Product.create({
       img: JSON.stringify(imgList), // 배열 형태의 데이터를 문자열로 변환 // JSON.parse(dbValue): 문자열을 다시 배열로 복원하려고
       name,
       price,
       content,
       color: JSON.stringify(colorArray),
-      // color: colorArray,
       size: JSON.stringify(sizeArray),
       categoryId,
     });
@@ -69,19 +57,12 @@ const itemRegister = async (req, res) => {
 // 상품 전체 조회
 const getItems = async (req, res) => {
   const { limit, sort, category, offset } = req.query;
-  console.log(limit, sort);
 
-  // 메인 요청: limit 4, offset undefined
-  // 페이지네이션: limit 20, offset 40
-
-  // console.log(req.query.category, "서버에서 확인"); // 서버에서 확인
   try {
     const whereClause = {};
 
     if (category) {
       whereClause.categoryId = category;
-      console.log(typeof whereClause.categoryId, "--------");
-      console.log(typeof category, "/////");
     }
 
     // 전체 상품 수 카운트 (카테고리 조건 포함)
@@ -95,7 +76,7 @@ const getItems = async (req, res) => {
           attributes: ["id", "category"], // 필요한 카테고리 필드만
         },
       ],
-      ...(limit && { limit: parseInt(limit) }), // 4개 제한
+      ...(limit && { limit: parseInt(limit) }), // 개수 제한
       ...(offset && { offset: parseInt(offset) }), // 페이지네이션만
       ...(sort === "desc" && { order: [["createdAt", "DESC"]] }), // 최신순 정렬
     });
@@ -106,28 +87,20 @@ const getItems = async (req, res) => {
       imgUrls: item.img ? JSON.parse(item.img) : [],
     }));
 
-    // // 검색어가 있는데 결과가 없으면 빈 배열 그대로 응답
-    // if (query && formatted.length === 0) {
-    //   return res.json({ data: [] });
-    // }
-
-    // console.log(items.length, "조회된 아이템 수");
-    // res.json({ data: items });
     res.json({
       data: formatted,
-      total, // 페이지네이션 UI에 사용됨
+      total,
     });
   } catch (err) {
     console.error(err);
   }
 };
 
-// 수정할 상품 조회
+// 상품 상세 조회
 const getItem = async (req, res) => {
   try {
     let { id } = req.params;
 
-    // console.log(req.params.id, "number");
     const item = await Product.findOne({
       where: { id },
       include: [
@@ -141,14 +114,12 @@ const getItem = async (req, res) => {
     if (!item) {
       return res.json({ message: "상품을 찾을 수 없습니다." });
     }
-    console.log(item.img, "no?");
 
     // 이미지 필드가 JSON 문자열이면 배열로 파싱
     const imgUrls = item.img ? JSON.parse(item.img) : [];
     const colorArray = item.color ? JSON.parse(item.color) : [];
     const sizeArray = item.size ? JSON.parse(item.size) : [];
 
-    // res.json({ data: item });
     res
       .status(200)
       .json({ data: { ...item.dataValues, imgUrls, colorArray, sizeArray } });
@@ -186,13 +157,11 @@ const updateProduct = async (req, res) => {
     const colorArray = color
       .split(",")
       .map((item) => item.trim())
-      .filter((item) => item); // 공백 제거 + 빈 값 제거
-    console.log(typeof colorArray);
-
+      .filter((item) => item);
     const sizeArray = size
       .split(",")
       .map((item) => item.trim())
-      .filter((item) => item); // 공백 제거 + 빈 값 제거
+      .filter((item) => item);
 
     const CategoryId = parseInt(categoryId, 10); // 숫자로 변환
 
@@ -217,7 +186,6 @@ const updateProduct = async (req, res) => {
 // 테이블 행(상품) 삭제
 const deleteProduct = async (req, res) => {
   try {
-    console.log(req, "csdfsd");
     let { id } = req.params;
 
     const product = await Product.destroy({ where: { id } });
@@ -230,11 +198,8 @@ const deleteProduct = async (req, res) => {
 
 // 상품 검색
 const getSearchItems = async (req, res) => {
-  console.log("✅ 검색 API 도착"); // 이게 안 찍히면 라우팅 문제입니다
   try {
     const { query } = req.query;
-
-    console.log("🔍 검색어:", query);
 
     if (!query || typeof query !== "string" || query.trim().length < 1) {
       return res.status(400).json({
