@@ -67,6 +67,9 @@ router.post(
 // 조회
 router.get("/product", productController.getItems);
 
+// 상품 검색
+router.get("/product/search", productController.getSearchItems); // 수정할 상품 조회 보다 상위에 위치해야 함 // :id 보다 아래에 위치할 경우 search가 :id로 해석된 것
+
 // 수정할 상품 조회
 router.get("/product/:id", productController.getItem);
 

@@ -11,7 +11,7 @@ module.exports = {
       },
       orderId: {
         type: Sequelize.STRING,
-        allowNull: false,
+        allowNull: true,
         unique: true, // Toss의 주문 ID와 연결
       },
       amount: {
@@ -27,6 +27,21 @@ module.exports = {
       },
       userId: {
         type: Sequelize.INTEGER,
+        allowNull: false,
+        references: {
+          model: "users", // 유저 테이블 이름
+          key: "id",
+        },
+        onDelete: "CASCADE",
+      },
+      shippingInfoId: {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+        references: {
+          model: "shopping_addresses", // 배송지 테이블 이름
+          key: "id",
+        },
+        onDelete: "SET NULL",
       },
       createdAt: {
         type: Sequelize.DATE,

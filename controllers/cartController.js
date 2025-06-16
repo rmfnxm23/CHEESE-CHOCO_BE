@@ -53,8 +53,27 @@ const getMyCartList = async (req, res) => {
     });
 
     // console.log(MyCart);
+    // img 파싱 처리
+    const parsedCart = MyCart.map((item) => {
+      const product = item.product;
 
-    res.status(200).json({ data: MyCart });
+      return {
+        ...item.toJSON(),
+        product: product
+          ? {
+              ...product,
+              name: product.name,
+              price: product.price,
+              img: JSON.parse(product.img || "[]"),
+              color: JSON.parse(product.color || "[]"),
+              size: JSON.parse(product.size || "[]"),
+            }
+          : null,
+      };
+    });
+    // console.log(parsedCart, "hey");
+
+    res.status(200).json({ data: parsedCart });
   } catch (err) {
     console.error(err);
   }

@@ -6,17 +6,27 @@ const addressRegister = async (req, res) => {
   console.log(req.body, "1");
   //   console.log(userId, "2");
   try {
-    await Shopping_Address.create({
+    const shippingInfo = await Shopping_Address.create({
       userId,
       name,
       zipCode,
       address,
       phone,
     });
-    res.status(200).json({ message: "배송지 저장 완료" });
+    res.status(200).json({ message: "배송지 저장 완료", data: shippingInfo });
   } catch (err) {
-    res.status(500).json({ message: "배송지 저장 실패", error: err.message });
+    res.status(500).json({ message: "배송지 저장 실패" });
   }
 };
 
-module.exports = { addressRegister };
+const getAddress = async (req, res) => {
+  try {
+    const addr = await Shopping_Address.findAll({});
+
+    res.status(200).json({ data: addr });
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+module.exports = { addressRegister, getAddress };

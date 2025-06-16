@@ -29,6 +29,13 @@ router.post("/pwVerifyCode", userController.verifyCode);
 // 비밀번호 변경
 router.post("/change/pw", userController.updateUserPw);
 
+// 사용자 정보 확인
 router.get("/me", authenticate, userController.getMe);
+
+// 회원정보 수정
+router.put("/update/myInfo", userController.updateMe);
+
+// 회원 탈퇴
+router.delete("/me", authenticate, userController.DeleteMe);
 
 module.exports = router;

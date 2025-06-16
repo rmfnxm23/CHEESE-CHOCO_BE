@@ -2,7 +2,7 @@
 const Sequelize = require("sequelize");
 const { Model } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
-  class shopping_address extends Model {
+  class orderItem extends Model {
     /**
      * Helper method for defining associations.
      * This method is not a part of Sequelize lifecycle.
@@ -12,43 +12,43 @@ module.exports = (sequelize, DataTypes) => {
       // define association here
     }
   }
-  shopping_address.init(
+  orderItem.init(
     {
-      id: {
+      paymentId: {
         type: Sequelize.INTEGER,
         allowNull: false,
-        autoIncrement: true,
-        primaryKey: true,
+        references: {
+          model: "payments", // Payment 테이블
+          key: "id",
+        },
+        onDelete: "CASCADE",
       },
-      userId: {
+      productId: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        references: {
+          model: "products",
+          key: "id",
+        },
+        onDelete: "CASCADE",
+      },
+      selectColor: {
+        type: Sequelize.STRING,
+      },
+      selectSize: {
+        type: Sequelize.STRING,
+      },
+      price: {
         type: Sequelize.INTEGER,
       },
-      name: {
-        type: Sequelize.STRING,
-      },
-      zipCode: {
-        type: Sequelize.STRING,
-      },
-      address: {
-        type: Sequelize.STRING,
-      },
-      phone: {
-        type: Sequelize.STRING,
-      },
-      createdAt: {
-        allowNull: false,
-        type: Sequelize.DATE,
-      },
-      updatedAt: {
-        allowNull: false,
-        type: Sequelize.DATE,
+      quantity: {
+        type: Sequelize.INTEGER,
       },
     },
     {
       sequelize,
-      modelName: "Shopping_Address",
-      tableName: "shopping_addresses",
+      modelName: "orderItem",
     }
   );
-  return shopping_address;
+  return orderItem;
 };

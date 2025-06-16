@@ -2,29 +2,29 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable("carts", {
+    await queryInterface.createTable("orderItems", {
       id: {
-        type: Sequelize.INTEGER,
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
-      },
-      userId: {
         type: Sequelize.INTEGER,
+      },
+      paymentId: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
         references: {
-          model: "users", // 참조 대상 테이블
-          key: "id", // 참조 대상 컬럼
+          model: "payments", // Payment 테이블
+          key: "id",
         },
-        onUpdate: "CASCADE",
-        onDelete: "CASCADE", // 유저 삭제 시 장바구니 항목도 삭제
+        onDelete: "CASCADE",
       },
       productId: {
         type: Sequelize.INTEGER,
+        allowNull: false,
         references: {
           model: "products",
           key: "id",
         },
-        onUpdate: "CASCADE",
         onDelete: "CASCADE",
       },
       selectColor: {
@@ -40,16 +40,16 @@ module.exports = {
         type: Sequelize.INTEGER,
       },
       createdAt: {
-        type: Sequelize.DATE,
         allowNull: false,
+        type: Sequelize.DATE,
       },
       updatedAt: {
-        type: Sequelize.DATE,
         allowNull: false,
+        type: Sequelize.DATE,
       },
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable("carts");
+    await queryInterface.dropTable("orderItems");
   },
 };

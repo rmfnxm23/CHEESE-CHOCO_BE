@@ -122,7 +122,7 @@ const userLogin = async (req, res) => {
 
     const payload = { id: userData.id, email: userData.email };
     const accessToken = jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, {
-      expiresIn: "1h",
+      expiresIn: "1d",
     });
     // console.log(accessToken);
 
@@ -342,6 +342,33 @@ const getMe = async (req, res) => {
   }
 };
 
+// 회원정보 수정
+const updateMe = async (req, res) => {
+  try {
+    let { id, phone } = req.body;
+    console.log(phone, "폰넘버");
+
+    await User.update({ phone }, { where: { id } });
+
+    res.status(201).json({ success: true, message: "정보가 수정되었습니다." });
+  } catch (err) {
+    console.error("회원정보 수정 중 오류 발생", err);
+    return res.status(500).json({ success: false, message: "서버 오류" });
+  }
+};
+
+// 회원 탈퇴
+const DeleteMe = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    await User.destroy({ where: { id: userId } });
+
+    res.status(201).json({ message: "회원 탈퇴되셨습니다." });
+  } catch (err) {
+    console.error("회원 탈퇴 중 오류 발생", err);
+  }
+};
+
 module.exports = {
   userRegister,
   emailCheck,
@@ -352,4 +379,6 @@ module.exports = {
   verifyCode,
   updateUserPw,
   getMe,
+  updateMe,
+  DeleteMe,
 };
