@@ -40,3 +40,5 @@ app.use("/orderItem", orderItemRouter);
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
 });
+
+console.log("✅ 현재 NODE_ENV:", process.env.NODE_ENV);
