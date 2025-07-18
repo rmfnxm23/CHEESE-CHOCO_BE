@@ -46,7 +46,7 @@ const itemRegister = async (req, res) => {
     });
 
     // 미사용 이미지 정리 서비스 호출
-    cleanUnusedImages(content);
+    // cleanUnusedImages(content);
 
     res.status(201).json({ message: "상품이 등록되었습니다." });
   } catch (err) {
