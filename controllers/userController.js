@@ -198,8 +198,9 @@ const getUserPw = async (req, res) => {
       });
     }
 
-    // 인증코드 생성 (1000 ~ 9999 사이)
-    const code = Math.floor(Math.floor(1000 + Math.random() * 9000));
+    // 인증코드 생성 (100000 ~ 999999 사이)
+    const code = Math.floor(Math.floor(100000 + Math.random() * 900000));
+    // const code = String(Math.floor(Math.random() * 1000000)).padStart(6, "0"); // 000000 ~ 999999 사이
 
     // 만료시간 설정 (현재 시간으로부터 10분까지 유효시간)
     const codeExpirationTime = Date.now() + 1000 * 60 * 10;
@@ -230,11 +231,63 @@ const getUserPw = async (req, res) => {
       to: email,
       subject: "[CHEESE&CHOCO] 비밀번호 재설정 안내",
       html: `
-        <p>아래 링크를 클릭하여 인증코드를 입력하고 비밀번호를 재설정하세요.<br>
-        인증코드: <strong>${code}</strong></p>
-        <a href="${link}">비밀번호 재설정</a>
-        <p>위 링크는 10분동안 유효합니다.</p>
-        `,
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+</head>
+<body style="margin:0; padding:0; font-family:'Noto Sans KR', Arial, sans-serif; background:#f9fafb; color:#111827;">
+  <div style="width:100%; padding:40px 0;">
+    <div style="max-width:600px; margin:0 auto; background:#f9fafb; border-radius:8px; overflow:hidden; border:1px solid #e5e7eb;">
+      
+      <!-- Header -->
+      <div style="padding:24px; text-align:center; background:#f9fafb; border-bottom:1px solid #e5e7eb;">
+        <div style="font-size:20px; font-weight:700; color:#111827;">CHEESE&CHOCO</div>
+      </div>
+
+      <!-- Content -->
+      <div style="padding:32px;">
+        <h1 style="font-size:20px; font-weight:700; margin:0 0 16px 0; color:#111827;">비밀번호 재설정 요청</h1>
+        <p style="margin:0 0 16px 0; line-height:1.6; color:#374151;">
+          안녕하세요, CHEESE&CHOCO 회원님.<br>
+          비밀번호 재설정을 위한 인증코드와 링크를 안내드립니다.<br>
+          <strong>아래 인증코드</strong>를 입력하거나 버튼을 눌러 비밀번호를 재설정하세요.
+        </p>
+
+        <!-- Code Box -->
+        <div style="text-align:center;">
+          <div style="display:inline-block; padding:14px 24px; border-radius:6px; background:#f3f4f6; 
+                      font-size:50px; font-weight:bolder; letter-spacing:6px; margin:20px 0; 
+                      text-align:center; font-style:italic;">
+            ${code}
+          </div>
+        </div>
+
+        <!-- Reset Button -->
+        <div style="text-align:center; margin:24px 0;">
+          <a href="${link}" 
+             style="display:inline-block; text-decoration:none; background:#6c5ce7; color:#ffffff; 
+                    font-weight:600; padding:14px 28px; border-radius:6px; font-size:16px;">
+            비밀번호 재설정하기
+          </a>
+        </div>
+
+        <p style="margin:0; line-height:1.6; color:#374151;">
+          해당 코드와 링크는 <strong>10분간 유효</strong>합니다.<br>
+          만약 본 요청을 하지 않으셨다면 이 메일을 무시하셔도 됩니다.
+        </p>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div style="padding:24px; font-size:12px; color:#6b7280; text-align:center;">
+      © ${new Date().getFullYear()} CHEESE&CHOCO. All rights reserved.
+    </div>
+  </div>
+</body>
+</html>
+`,
     };
 
     // 이메일 전송
