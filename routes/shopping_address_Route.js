@@ -11,6 +11,6 @@ router.post(
   shopping_address_Controller.addressRegister
 );
 
-router.get("/list", shopping_address_Controller.getAddress);
+router.get("/list", authenticate, shopping_address_Controller.getAddress);
 
 module.exports = router;

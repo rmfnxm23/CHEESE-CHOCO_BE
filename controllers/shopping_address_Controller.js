@@ -20,11 +20,12 @@ const addressRegister = async (req, res) => {
 
 const getAddress = async (req, res) => {
   try {
-    const addr = await Shopping_Address.findAll({});
-
+    const userId = req.user.id; // 인증 미들웨어에서 세팅된 사용자 ID
+    const addr = await Shopping_Address.findAll({ where: { userId: userId } });
+    console.log(addr, "내꺼만 맞음?");
     res.status(200).json({ data: addr });
   } catch (err) {
-    console.error(err);
+    res.status(500).json({ message: "배송지 목록 조회 실패", error: err });
   }
 };
 
